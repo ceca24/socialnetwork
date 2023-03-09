@@ -81,3 +81,38 @@ const thoughtController = {
                     return res.status(404).json({ message: 'No user here!' }) }
                 res.json ({ message: 'Thought deleted!' });})}
             },
+
+    // add reaction
+    addReaction(req, res) {
+        Thought.findOneAndUpdate(
+            { _id: req.params.id },
+            { $addToSet: { reactions: req.body } },
+            { runValidators: true, new: true }
+        )
+            .then((thought) => {
+                if (!thought) {
+                    return res.status(404).json({ message: 'No thoughts! Head Empty!' });
+                }
+                res.json(thought);
+            }
+            .catch((err) => res.status(400).json(err));
+    },
+
+    // delete reaction
+    deleteReaction(req, res) {
+        Thought.findOneAndUpdate(
+            { _id: req.params.id },
+            { $pull: { reactions: { reactionId: req.params.reactionId } } },
+            { new: true }
+        )
+            .then((thought) => {
+                if (!thought) {
+                    return res.status(404).json({ message: 'No thoughts! Head Empty!' });
+                }
+                res.json(thought);
+            }
+            .catch((err) => res.status(400).json(err));
+    },
+};
+
+module.exports = thoughtController;
